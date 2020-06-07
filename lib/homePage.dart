@@ -4,36 +4,34 @@ import 'package:proyecto_blog/photoUpload.dart';
 import 'package:proyecto_blog/posts.dart';
 
 class HomePage extends StatefulWidget {
+  
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Posts> postList = [];
+  List<Posts> postList = List();
+
+  final fb = FirebaseDatabase.instance.reference().child("Posts");
 
   @override
   void initState() {
     super.initState();
-    DatabaseReference postsRef =
-        FirebaseDatabase.instance.reference().child("Posts");
-    postsRef.once().then((DataSnapshot snap) {
-      var keys = snap.value.keys;
+    fb.once().then((DataSnapshot snap){
       var data = snap.value;
-
       postList.clear();
-
-      for (var individualKey in keys) {
+      data.forEach((key, value) {
         Posts posts = Posts(
-            data[individualKey]['image'],
-            data[individualKey]['description'],
-            data[individualKey]['date'],
-            data[individualKey]['time']);
+          image: value['image'],
+          description: value['description'],
+          date: value['date'],
+          time: value['time']
+        );
 
         postList.add(posts);
-      }
-
+      });
       setState(() {
-        print('Length: $postList.length');
+        
       });
     });
   }
